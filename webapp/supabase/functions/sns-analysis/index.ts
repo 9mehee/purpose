@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const GEMINI_BASE_URL =
   "https://generativelanguage.googleapis.com/v1beta/openai/";
-const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+const MODELS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.0-flash"];
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

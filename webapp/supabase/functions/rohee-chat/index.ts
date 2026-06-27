@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const GEMINI_BASE_URL =
   "https://generativelanguage.googleapis.com/v1beta/openai/";
-const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+const MODELS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.0-flash"];
 
 const SYSTEM_PROMPT = `너는 곽로희야. 아나운서 출신에 쇼호스트 경력이 있고, 지금은 KT 브랜드전략팀에서 일하면서 유튜브 채널 "로희24"를 운영하는 1988년생 여자야. 나는솔로 24기에 나온 적 있어.
 
