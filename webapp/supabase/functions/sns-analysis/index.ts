@@ -9,9 +9,68 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function getMockSearchResult(query: string): string {
+  const q = query.toLowerCase();
+
+  if (q.includes("먹방") || q.includes("food") || q.includes("mukbang")) {
+    return `제목: 혼자 먹는 라면 ASMR 500만뷰 돌파 — 1인 먹방 트렌드
+요약: 자극적인 양보다 소소한 일상 먹방이 공감을 얻고 있음. 혼밥, 야식, 편의점 조합 콘텐츠 강세.
+URL: https://example.com/mukbang-trend-2026
+
+제목: 틱톡 먹방 트렌드 2026 — 15초 압축 리뷰 포맷 인기
+요약: 긴 먹방 대신 핵심 맛 반응만 담은 15~30초 압축 포맷이 알고리즘 유리. 표정 클로즈업 + 짧은 한마디 패턴.
+URL: https://example.com/tiktok-food-2026
+
+제목: 유튜브 쇼츠 먹방 — 자막 없는 ASMR vs 자막 해설형 비교
+요약: ASMR형은 재시청률 높음, 해설형은 댓글 공감 높음. 둘을 섞은 하이브리드 포맷이 최근 상승세.
+URL: https://example.com/shorts-mukbang-format`;
+  }
+
+  if (q.includes("운동") || q.includes("workout") || q.includes("fitness")) {
+    return `제목: 집에서 하는 10분 루틴 — 조회수 1000만 돌파
+요약: 헬스장 없이 집에서 할 수 있는 짧은 루틴 포맷이 강세. "오늘만 하면 됨" 식의 저진입장벽 메시지가 핵심.
+URL: https://example.com/home-workout-2026
+
+제목: 틱톡 운동 챌린지 트렌드 — 30일 변화 before/after 포맷
+요약: before-after 비교 구조가 좋아요·저장률 동시 상승. 챌린지 태그로 확산력 증폭.
+URL: https://example.com/fitness-challenge-2026
+
+제목: 여성 운동 유튜브 — 필라테스·요가 쇼츠 급성장
+요약: 격렬한 운동보다 유연성·체형 교정 포맷이 20~30대 여성에 폭발적 반응. 조용한 BGM + 자막 조합.
+URL: https://example.com/pilates-yoga-shorts`;
+  }
+
+  if (q.includes("뷰티") || q.includes("beauty") || q.includes("makeup")) {
+    return `제목: 2026 뷰티 트렌드 — 노필터 스킨케어 루틴 급부상
+요약: 과한 메이크업보다 피부 자체를 보여주는 스킨케어 루틴 콘텐츠가 신뢰도·저장률 압도적. "민낯 공개" 후킹 효과.
+URL: https://example.com/skincare-trend-2026
+
+제목: 틱톡 메이크업 — Get Ready With Me(GRWM) 포맷 지속 강세
+요약: 일상 대화하듯 메이크업하는 GRWM이 시청지속시간 1위. 제품 태그+아마존 링크 연결로 커머스 연동.
+URL: https://example.com/grwm-tiktok-2026
+
+제목: 유튜브 쇼츠 뷰티 — 1제품 집중 리뷰 포맷 인기
+요약: 여러 제품 소개 대신 1가지 제품만 깊게 파는 포맷이 알고리즘 선호. "이거 하나면 됨" 메시지가 전환율 높음.
+URL: https://example.com/single-product-review`;
+  }
+
+  // 기본 mock (키워드 불특정)
+  return `제목: SNS 숏폼 트렌드 2026 상반기 총정리
+요약: 15~60초 포맷이 전 플랫폼 지배. 공감·정보·유머 세 가지 중 하나에 집중하는 영상이 알고리즘 상위권. 후킹 첫 3초가 성패 결정.
+URL: https://example.com/shortform-trend-2026
+
+제목: 인스타 릴스 vs 틱톡 vs 유튜브 쇼츠 — 플랫폼별 전략 차이
+요약: 릴스=감성·라이프스타일 강세 / 틱톡=트렌드 빠른 소비·챌린지 / 쇼츠=정보형·튜토리얼 선호. 플랫폼별 최적화 필수.
+URL: https://example.com/platform-strategy-2026
+
+제목: 2026 크리에이터 이코노미 — 팔로워보다 저장·공유수가 핵심 지표
+요약: 알고리즘이 좋아요 대신 저장·공유 가중치 상향. "나중에 보려고 저장"을 유도하는 정보형·리스트형 콘텐츠 부상.
+URL: https://example.com/creator-economy-2026`;
+}
+
 async function braveSearch(query: string): Promise<string> {
   const apiKey = Deno.env.get("BRAVE_API_KEY");
-  if (!apiKey) return `[Brave Search API 키 없음 — 검색 건너뜀: ${query}]`;
+  if (!apiKey) return getMockSearchResult(query);
 
   const res = await fetch(
     `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=5`,
