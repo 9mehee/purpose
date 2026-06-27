@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "로희24 에이전트",
   description: "곽로희 SNS 트렌드 분석 & 콘텐츠 기획 에이전트",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({
