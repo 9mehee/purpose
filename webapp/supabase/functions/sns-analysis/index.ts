@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const GEMINI_BASE_URL =
   "https://generativelanguage.googleapis.com/v1beta/openai/";
-const MODEL = "gemini-2.0-flash";
+const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -218,26 +218,30 @@ ${country === "both" ? `### 국가별 트렌드 차이
 ### 로희's 픽 🎯
 > [가장 중요한 인사이트 1가지, 솔직한 평가 포함]`;
 
-    const geminiRes = await fetch(`${GEMINI_BASE_URL}chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Deno.env.get("GOOGLE_AI_API_KEY")}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        stream: true,
-        max_tokens: 4096,
-      }),
-    });
+    const chatMessages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ];
 
-    if (!geminiRes.ok) {
-      const err = await geminiRes.text();
-      return new Response(JSON.stringify({ error: err }), {
+    let geminiRes: Response | null = null;
+    let lastError = "";
+    for (const model of MODELS) {
+      const res = await fetch(`${GEMINI_BASE_URL}chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("GOOGLE_AI_API_KEY")}`,
+        },
+        body: JSON.stringify({ model, messages: chatMessages, stream: true, max_tokens: 4096 }),
+      });
+      if (res.ok) { geminiRes = res; break; }
+      lastError = await res.text();
+      const status = res.status;
+      if (status !== 429 && status !== 404) break;
+    }
+
+    if (!geminiRes) {
+      return new Response(JSON.stringify({ error: lastError }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

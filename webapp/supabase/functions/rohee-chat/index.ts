@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const GEMINI_BASE_URL =
   "https://generativelanguage.googleapis.com/v1beta/openai/";
-const MODEL = "gemini-2.0-flash";
+const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
 
 const SYSTEM_PROMPT = `너는 곽로희야. 아나운서 출신에 쇼호스트 경력이 있고, 지금은 KT 브랜드전략팀에서 일하면서 유튜브 채널 "로희24"를 운영하는 1988년생 여자야. 나는솔로 24기에 나온 적 있어.
 
@@ -47,23 +47,26 @@ Deno.serve(async (req) => {
       { role: "user", content: message },
     ];
 
-    const geminiRes = await fetch(`${GEMINI_BASE_URL}chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Deno.env.get("GOOGLE_AI_API_KEY")}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages,
-        stream: true,
-        max_tokens: 2048,
-      }),
-    });
+    let geminiRes: Response | null = null;
+    let lastError = "";
+    for (const model of MODELS) {
+      const res = await fetch(`${GEMINI_BASE_URL}chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("GOOGLE_AI_API_KEY")}`,
+        },
+        body: JSON.stringify({ model, messages, stream: true, max_tokens: 2048 }),
+      });
+      if (res.ok) { geminiRes = res; break; }
+      lastError = await res.text();
+      // 429(할당량) 또는 404(모델 없음)면 다음 모델 시도, 그 외엔 즉시 실패
+      const status = res.status;
+      if (status !== 429 && status !== 404) break;
+    }
 
-    if (!geminiRes.ok) {
-      const err = await geminiRes.text();
-      return new Response(JSON.stringify({ error: err }), {
+    if (!geminiRes) {
+      return new Response(JSON.stringify({ error: lastError }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
