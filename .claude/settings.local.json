@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:youtube.com)",
+      "WebFetch(domain:www.instagram.com)",
+      "WebFetch(domain:www.youtube.com)",
+      "WebSearch"
+    ]
+  }
+}
